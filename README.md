@@ -22,3 +22,7 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+* Users can: sign up/sign in; add/edit/delete accounts; record transactions; view balances; filter by category/date; basic charts.
+* Tech: Rails 7/8; Postgres; any front‑end (ERB/Hotwire or React). Tests required.
+* Deliverable: MR using Project_Submission template; deploy URL.
