@@ -1,15 +1,131 @@
-<% content_for :title, "Showing account" %>
+<% content_for :title, "Account: #{@account.name}" %>
+<!-- 1. Display Balance -->
+<p class="text-3xl font-bold"><%= number_to_currency(@account.balance) %></p>
 
-<div class="md:w-2/3 w-full">
+<div class="md:w-3/4 w-full mx-auto">
   <% if notice.present? %>
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
   <% end %>
 
-  <h1 class="font-bold text-4xl">Showing account</h1>
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="font-bold text-4xl"><%= @account.name %></h1>
+    <div class="text-right">
+      <p class="text-sm text-gray-500 uppercase">Current Balance</p>
+      <p class="text-3xl font-bold"><%= number_to_currency(@account.balance) %></p>
+    </div>
+  </div>
 
-  <%= render @account %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+    <!-- Transaction Recording Form -->
+    <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Record New Transaction</h2>
+      <%= form_with(model: [@account, Transaction.new], local: true, class: "space-y-4") do |f| %>
+        <div>
+          <%= f.label :amount, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.number_field :amount, step: 0.01, required: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        </div>
+        <div>
+          <%= f.label :category, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :category, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        </div>
+        <div>
+          <%= f.label :transaction_date, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.date_field :transaction_date, value: Date.today, required: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        </div>
+        <div>
+          <%= f.label :description, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_area :description, rows: 2, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+        </div>
+        <%= f.submit "Record Transaction", class: "w-full py-2.5 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 cursor-pointer shadow-sm transition duration-150 ease-in-out" %>
+      <% end %>
+    </div>
 
-  <%= link_to "Edit this account", edit_account_path(@account), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to accounts", accounts_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this account", @account, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+    <!-- Spending Chart -->
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800 w-full">Spending by Category</h2>
+      <canvas id="spendingChart" class="max-h-64"></canvas>
+    </div>
+  </div>
+
+  <!-- Filtering Section -->
+  <div class="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+    <h3 class="text-sm font-semibold mb-3 text-gray-600 uppercase tracking-wider">Filters</h3>
+    <%= form_with(url: account_path(@account), method: :get, local: true, class: "flex flex-wrap gap-4 items-end") do |f| %>
+      <div class="flex-1 min-w-37.5">
+        <%= f.label :category, "Category", class: "block text-xs font-medium text-gray-700 mb-1" %>
+        <%= f.select :category, @account.transactions.pluck(:category).uniq, { include_blank: "All Categories" }, { class: "block w-full rounded-md border-gray-300 py-1.5 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" } %>
+      </div>
+      <div class="flex-1 min-w-37.5">
+        <%= f.label :start_date, "Start Date", class: "block text-xs font-medium text-gray-700 mb-1" %>
+        <%= f.date_field :start_date, value: params[:start_date], class: "block w-full rounded-md border-gray-300 py-1.5 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+      <div class="flex-1 min-w-37.5">
+        <%= f.label :end_date, "End Date", class: "block text-xs font-medium text-gray-700 mb-1" %>
+        <%= f.date_field :end_date, value: params[:end_date], class: "block w-full rounded-md border-gray-300 py-1.5 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      </div>
+      <div>
+        <%= f.submit "Filter", class: "bg-white border border-gray-300 rounded-md py-1.5 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm cursor-pointer" %>
+        <%= link_to "Reset", account_path(@account), class: "text-sm text-gray-500 hover:text-indigo-600 ml-2" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Transaction List -->
+  <div class="bg-white shadow overflow-hidden border-b border-gray-200 rounded-lg mb-8">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+          <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+          <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @transactions.each do |transaction| %>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= transaction.transaction_date.strftime("%b %d, %Y") %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= transaction.category.presence || "-" %></td>
+            <td class="px-6 py-4 text-sm text-gray-500"><%= transaction.description %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium <%= transaction.amount < 0 ? 'text-red-600' : 'text-green-600' %>">
+              <%= number_to_currency(transaction.amount) %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <%= button_to "Delete", account_transaction_path(@account, transaction), method: :delete, class: "text-red-600 hover:text-red-900 bg-transparent border-0 cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @transactions.empty? %>
+          <tr>
+            <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500 italic">No transactions found matching your criteria.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex gap-4 mb-10">
+    <%= link_to "Edit this account", edit_account_path(@account), class: "rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium border border-gray-300" %>
+    <%= link_to "Back to accounts", accounts_path, class: "rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium border border-gray-300" %>
+  </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('turbo:load', function() {
+    const ctx = document.getElementById('spendingChart');
+    const chartData = <%= @chart_data.to_json.html_safe %>
+
+    new Chart(cxt, {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(chartData),
+        datasets: [{
+          data: Object.values(chartData),
+          backgroundColor: [ '#4F46E5','#10B981','#F59E0B','#EF4444' ]
+        }]
+      }
+    })
+    })
+</script>
