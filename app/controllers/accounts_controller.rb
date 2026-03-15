@@ -8,6 +8,18 @@ class AccountsController < ApplicationController
 
   # GET /accounts/1 or /accounts/1.json
   def show
+    # Update the show action to handle filtering and chart data:
+    @transactions = @account.transactions.order(transaction_date: :desc)
+
+    # Filter by category
+    @transactions = @transactions.where(category: params[:category]) if params[:category].present?
+
+    # Filter by date range
+    @transactions = @transactions.where("transaction_date >= ?", params[:start_date]) if params[:start_date].present?
+    @transactions = @transactions.where("transaction_date <= ?", params[:end_date]) if params[:end_date].present?
+
+    # Data for charts (spending by category)
+    @chart_data = @account.transactions.group(:category).sum(:amount)
   end
 
   # GET /accounts/new
