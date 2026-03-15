@@ -1,29 +1,38 @@
-<% content_for :title, "Accounts" %>
+<% content_for :title, "My Accounts" %>
 
-<div class="w-full">
+<div class="w-full max-w-5xl mx-auto px-4">
   <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block shadow-sm" id="notice"><%= notice %></p>
   <% end %>
 
-  <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Accounts</h1>
-    <%= link_to "New account", new_account_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+  <div class="flex justify-between items-end mb-8 border-b border-gray-100 pb-6">
+    <div>
+      <h1 class="font-bold text-4xl text-gray-900">My Accounts</h1>
+      <p class="text-gray-500 mt-2">Manage your financial accounts and track balances.</p>
+    </div>
+    <%= link_to "Add New Account", new_account_path, class: "rounded-md px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm transition-colors duration-200" %>
   </div>
 
-  <div id="accounts" class="min-w-full divide-y divide-gray-200 space-y-5">
-    <% if @accounts.any? %>
+  <% if @accounts.any? %>
+    <div id="accounts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <% @accounts.each do |account| %>
-        <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
+        <div class="flex flex-col">
           <%= render account %>
-          <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
-            <%= link_to "Show", account, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= link_to "Edit", edit_account_path(account), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= button_to "Destroy", account, method: :delete, class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+          <div class="mt-2 flex gap-2">
+            <%= link_to "Edit", edit_account_path(account), class: "text-xs text-gray-500 hover:text-indigo-600 font-medium" %>
+            <span class="text-gray-300">|</span>
+            <%= button_to "Delete", account, method: :delete, class: "text-xs text-gray-500 hover:text-red-600 font-medium bg-transparent border-0 p-0 cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
           </div>
         </div>
       <% end %>
-    <% else %>
-      <p class="text-center my-10">No accounts found.</p>
-    <% end %>
-  </div>
+    </div>
+  <% else %>
+    <div class="text-center py-20 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">No accounts yet</h3>
+      <p class="mt-1 text-gray-500">Get started by creating your first financial account.</p>
+      <div class="mt-6">
+        <%= link_to "Create Account", new_account_path, class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" %>
+      </div>
+    </div>
+  <% end %>
 </div>
