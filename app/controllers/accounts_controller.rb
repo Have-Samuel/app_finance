@@ -19,7 +19,8 @@ class AccountsController < ApplicationController
     @transactions = @transactions.where("transaction_date <= ?", params[:end_date]) if params[:end_date].present?
 
     # Data for charts (spending by category)
-    @chart_data = @account.transactions.group(:category).sum(:amount)
+    # @chart_data = @account.transactions.group(:category).sum(:amount)
+    @chart_data = @transactions.unscope(:order).group(:category).sum(:amount)
   end
 
   # GET /accounts/new
