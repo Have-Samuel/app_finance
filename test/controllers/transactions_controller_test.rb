@@ -10,13 +10,13 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
   test "should create transaction and update balance" do
     initial_balance = @account.balance || 0
     assert_difference("Transaction.count") do
-      post account_transactions_url(@account), params: { 
-        transaction: { 
-          amount: 50.0, 
-          category: "Food", 
+      post account_transactions_url(@account), params: {
+        transaction: {
+          amount: 50.0,
+          category: "Food",
           transaction_date: Date.today,
           description: "Lunch"
-        } 
+        }
       }
     end
 
