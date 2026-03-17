@@ -115,7 +115,7 @@
     const ctx = document.getElementById('spendingChart');
     const chartData = <%= @chart_data.to_json.html_safe %>
 
-    new Chart(cxt, {
+    new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: Object.keys(chartData),
