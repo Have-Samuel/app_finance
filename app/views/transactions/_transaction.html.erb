@@ -1,0 +1,11 @@
+<tr id="<%= dom_id(transaction) %>">
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= transaction.transaction_date.strftime("%b %d, %Y") %></td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= transaction.category.presence || "-" %></td>
+  <td class="px-6 py-4 text-sm text-gray-500"><%= transaction.description %></td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium <%= transaction.amount < 0 ? 'text-red-600' : 'text-green-600' %>">
+    <%= number_to_currency(transaction.amount) %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+    <%= button_to "Delete", account_transaction_path(transaction.account, transaction), method: :delete, class: "text-red-600 hover:text-red-900 bg-transparent border-0 cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+  </td>
+</tr>

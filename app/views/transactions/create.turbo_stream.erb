@@ -1,0 +1,26 @@
+<%= turbo_stream.prepend "transactions", partial: "transactions/transaction", locals: { transaction: @transaction } %>
+<%= turbo_stream.remove "no-transactions" %>
+<%= turbo_stream.replace dom_id(@account, :balance) do %>
+  <p class="text-3xl font-bold" id="<%= dom_id(@account, :balance) %>"><%= number_to_currency(@account.balance) %></p>
+<% end %>
+<%= turbo_stream.replace "new_transaction" do %>
+  <%= form_with(model: [@account, Transaction.new], class: "space-y-4") do |f| %>
+    <div>
+      <%= f.label :amount, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.number_field :amount, step: 0.01, required: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+    </div>
+    <div>
+      <%= f.label :category, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :category, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+    </div>
+    <div>
+      <%= f.label :transaction_date, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.date_field :transaction_date, value: Date.today, required: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+    </div>
+    <div>
+      <%= f.label :description, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_area :description, rows: 2, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+    </div>
+    <%= f.submit "Record Transaction", class: "w-full py-2.5 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 cursor-pointer shadow-sm transition duration-150 ease-in-out" %>
+  <% end %>
+<% end %>

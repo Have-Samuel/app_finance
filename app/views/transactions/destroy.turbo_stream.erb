@@ -1,0 +1,6 @@
+<!--To remove the transaction row and update the account balance after a transaction is
+  deleted.-->
+<%= turbo_stream.remove dom_id(@transaction) %>
+<%= turbo_stream.replace dom_id(@account, :balance) do %>
+  <p class="text-3xl font-bold" id="<%= dom_id(@account, :balance) %>"><%= number_to_currency(@account.balance) %></p>
+<% end %>
