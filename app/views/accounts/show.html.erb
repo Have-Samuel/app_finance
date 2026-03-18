@@ -9,7 +9,7 @@
     <h1 class="font-bold text-4xl"><%= @account.name %></h1>
     <div class="text-right">
       <p class="text-sm text-gray-500 uppercase">Current Balance</p>
-      <p class="text-3xl font-bold"><%= number_to_currency(@account.balance) %></p>
+      <p class="text-3xl font-bold" id="<%= dom_id(@account, :balance) %>"><%= number_to_currency(@account.balance) %></p>
     </div>
   </div>
 
@@ -17,25 +17,27 @@
     <!-- Transaction Recording Form -->
     <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
       <h2 class="text-xl font-semibold mb-4 text-gray-800">Record New Transaction</h2>
-      <%= form_with(model: [@account, Transaction.new], local: true, class: "space-y-4") do |f| %>
-        <div>
-          <%= f.label :amount, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.number_field :amount, step: 0.01, required: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
-        </div>
-        <div>
-          <%= f.label :category, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_field :category, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
-        </div>
-        <div>
-          <%= f.label :transaction_date, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.date_field :transaction_date, value: Date.today, required: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
-        </div>
-        <div>
-          <%= f.label :description, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_area :description, rows: 2, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
-        </div>
-        <%= f.submit "Record Transaction", class: "w-full py-2.5 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 cursor-pointer shadow-sm transition duration-150 ease-in-out" %>
-      <% end %>
+      <div id="new_transaction">
+        <%= form_with(model: [@account, Transaction.new], class: "space-y-4") do |f| %>
+          <div>
+            <%= f.label :amount, class: "block text-sm font-medium text-gray-700" %>
+            <%= f.number_field :amount, step: 0.01, required: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+          </div>
+          <div>
+            <%= f.label :category, class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_field :category, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+          </div>
+          <div>
+            <%= f.label :transaction_date, class: "block text-sm font-medium text-gray-700" %>
+            <%= f.date_field :transaction_date, value: Date.today, required: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+          </div>
+          <div>
+            <%= f.label :description, class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_area :description, rows: 2, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+          </div>
+          <%= f.submit "Record Transaction", class: "w-full py-2.5 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 cursor-pointer shadow-sm transition duration-150 ease-in-out" %>
+        <% end %>
+      </div>
     </div>
 
     <!-- Spending Chart -->
@@ -80,22 +82,12 @@
           <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
         </tr>
       </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
+      <tbody class="bg-white divide-y divide-gray-200" id="transactions">
         <% @transactions.each do |transaction| %>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= transaction.transaction_date.strftime("%b %d, %Y") %></td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= transaction.category.presence || "-" %></td>
-            <td class="px-6 py-4 text-sm text-gray-500"><%= transaction.description %></td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium <%= transaction.amount < 0 ? 'text-red-600' : 'text-green-600' %>">
-              <%= number_to_currency(transaction.amount) %>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <%= button_to "Delete", account_transaction_path(@account, transaction), method: :delete, class: "text-red-600 hover:text-red-900 bg-transparent border-0 cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
-            </td>
-          </tr>
+          <%= render "transactions/transaction", transaction: transaction %>
         <% end %>
         <% if @transactions.empty? %>
-          <tr>
+          <tr id="no-transactions">
             <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500 italic">No transactions found matching your criteria.</td>
           </tr>
         <% end %>
