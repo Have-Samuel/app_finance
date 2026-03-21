@@ -32,6 +32,16 @@ class AccountsController < ApplicationController
   def edit
   end
 
+  def dashboard
+    # Fetch only the accounts belonging to the currently logged-in user
+    @accounts = Current.user.accounts
+    # Calculate the sum of all account balances for the header display
+    @total_balance = @accounts.sum(:balance)
+    # Fetch the 10 most recent transactions across ALL of the user's accounts
+    # We use 'pluck(:id)' to get a list of account IDs that belong to the user
+    @recent_transactions = Current.user.transactions.order(transaction_date: :desc).limit(10)
+  end
+
   # POST /accounts or /accounts.json
   def create
     @account = Account.new(account_params)
@@ -46,7 +56,6 @@ class AccountsController < ApplicationController
       end
     end
   end
-
   # PATCH/PUT /accounts/1 or /accounts/1.json
   def update
     respond_to do |format|
