@@ -1,0 +1,69 @@
+<div class="w-full">
+    <%# --- Head Section--- %>
+    <%# justify-between pushes the title to the left and balance to the right%>
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="font-bold text-4xl text-gray-900">Dashboard</h1>
+        <div class="text-right text-gray-600">
+            <p class="text-sm font-medium text-gray-500 uppercase tracling-wider">Total Balance</p>
+            <p class="text-3xl font-bold text-blue-600"><%= number_to_currency(@total_balance) %></p>
+        </div>
+    </div>
+    <%# grid-cols-1 for mobile (stacked), md:grid-cols2 for desktop (side by side) %>
+    <div class="grid grid-clos-1 md:grid-cols-2 gap-8">
+        <!--Account summary-->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <div class="flex jutify-between items-center mb-6">
+                <h2 class="text-xl font-semibold mx-2">Your Accounts</h2>
+                <%= link_to "View All", accounts_path, class: "text-blue-500 hover:underline text-sm" %>
+            </div>
+
+            <div class="space-y-4">
+                <% @accounts.each do |account| %>
+                <%# Each account row is a flex container for name and balance %>
+                <div class="flex justify-between items-center p-3 hover:bg-gray-50 rounded transition-colors group">
+                    <%# Link to the individaul account show page %>
+                    <%= link_to account.name, account, class:"font-semibold text-gray-700 group-hover:text-blue-600" %>
+                    <%# Dynamic color: Green for positive balance, red for negative %>
+                    <span class="font-mono font-bold <%= account.balance >= 0 ? 'text-green' : 'text-red-600' %>"><%= number_to_currency(account.balance) %></span>
+                </div>
+                <% end %>
+            </div>
+        </div>
+
+        <%# --- Right column: Recent Transactions ---%>
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Recent Activity</h2>
+
+            <div class="divide-y divide-gray-100">
+                <% if @recent_transactions.any? %>
+                <% @recent_transactions.each do |transaction| %>
+                <div class="py-4 flex justify-between items-start">
+                    <%# Left side: Description and Date %>
+                    <div>
+                        <p class="font-semibold text-gray-800"><%= transaction.description %></p>
+                        <p class="text-xs text-gray-500 font-medium"><%= transaction.transaction_date.strftime("%b %d") %>.
+                        <span class="text-gray-400"><%= transaction.account.name %></span></p>
+                    </div>
+
+                    <%# Right side: Amount and Category %>
+                    <div class="text-right">
+                        <p class="font-bold <%= transaction.amount >= 0 ? 'text-green-600' : 'text-red-600' %>">
+                            <%= transaction.amount >= 0 ? "+" : "" %><%= number_to_currency(transaction.amount) %>
+                        </p>
+                        <%# .capitalize turns "food" into "Food" %>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-100 text-grat-500">
+                            <%= transaction.category %>
+                        </span>
+                    </div>
+                </div>
+              <% end %>
+            <% else %>
+            <%# Fallback if there is no data yet %>
+            <div class="tect-center py-10">
+                <p class="text-gray-400 italic">No transactions recorded yet.</p>
+            </div>
+            <% end %>
+            </div>
+        </div>
+    </div>
+</div>
