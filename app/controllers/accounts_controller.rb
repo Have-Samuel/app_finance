@@ -34,7 +34,8 @@ class AccountsController < ApplicationController
 
   def dashboard
     # Fetch only the accounts belonging to the currently logged-in user
-    @accounts = Current.user.accounts
+    # @accounts = Current.user.accounts
+    @accounts = Current.user.accounts.includes(:transactions)
     # Calculate the sum of all account balances for the header display
     @total_balance = @accounts.sum(:balance)
     # Fetch the 10 most recent transactions across ALL of the user's accounts
