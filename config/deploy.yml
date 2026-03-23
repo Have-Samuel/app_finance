@@ -27,7 +27,8 @@ servers:
 # Where you keep your container images.
 registry:
   # Alternatives: hub.docker.com / registry.digitalocean.com / ghcr.io / ...
-  server: localhost:5555
+  # server: localhost:5555
+  server: index.docker.io/have
 
   # Needed for authenticated registries.
   # username: your-user
