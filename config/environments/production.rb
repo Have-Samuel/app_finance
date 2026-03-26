@@ -80,11 +80,11 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [ :id ]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
-  # config.hosts = [
-  #   "example.com",     # Allow requests from example.com
-  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  # ]
-  #
-  # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  # We allow all .onrender.com subdomains for CSRF origin check.
+  config.hosts = [
+    /.*\.onrender\.com/
+  ]
+  
+  # Ensure the origin check is performed for CSRF
+  config.action_controller.forgery_protection_origin_check = true
 end
