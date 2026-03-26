@@ -7,7 +7,11 @@ image: app_finance
 # Deploy to these servers.
 servers:
   web:
+    # - 192.168.0.1
     - 41.210.141.249
+    # - 172.217.170.174
+    # - 35.242.45.0
+    # - 192.168.100.1
   # job:
   #   hosts:
   #     - 192.168.0.1
