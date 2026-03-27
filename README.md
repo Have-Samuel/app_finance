@@ -20,6 +20,7 @@ A modern Ruby on Rails application for managing personal finances, tracking acco
 - Rails 8.0+
 - SQLite3
 - Node.js & NPM (for Tailwind CSS and JavaScript bundling)
+- Render for Web Services
 
 ### Installation
 
