@@ -3,7 +3,7 @@ class AccountsController < ApplicationController
 
   # GET /accounts or /accounts.json
   def index
-    @accounts = Account.all
+    @accounts = Current.user.accounts
   end
 
   # GET /accounts/1 or /accounts/1.json
@@ -25,7 +25,7 @@ class AccountsController < ApplicationController
 
   # GET /accounts/new
   def new
-    @account = Account.new
+    @account = Current.user.accounts.build
   end
 
   # GET /accounts/1/edit
@@ -34,18 +34,16 @@ class AccountsController < ApplicationController
 
   def dashboard
     # Fetch only the accounts belonging to the currently logged-in user
-    # @accounts = Current.user.accounts
     @accounts = Current.user.accounts.includes(:transactions)
     # Calculate the sum of all account balances for the header display
     @total_balance = @accounts.sum(:balance)
     # Fetch the 10 most recent transactions across ALL of the user's accounts
-    # We use 'pluck(:id)' to get a list of account IDs that belong to the user
     @recent_transactions = Current.user.transactions.order(transaction_date: :desc).limit(10)
   end
 
   # POST /accounts or /accounts.json
   def create
-    @account = Account.new(account_params)
+    @account = Current.user.accounts.build(account_params)
 
     respond_to do |format|
       if @account.save
@@ -83,11 +81,11 @@ class AccountsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_account
-      @account = Account.find(params.expect(:id))
+      @account = Current.user.accounts.find(params.expect(:id))
     end
 
     # Only allow a list of trusted parameters through.
     def account_params
-      params.expect(account: [ :name, :balance, :user_id ])
+      params.expect(account: [ :name, :balance ])
     end
 end
